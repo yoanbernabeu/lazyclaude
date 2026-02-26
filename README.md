@@ -12,6 +12,8 @@ A tmux workspace combining **Claude Code** + **LazyGit** + **Terminal** in a sin
 └──────────┴──────────┘
 ```
 
+![LazyClaude screenshot](image.png)
+
 ## Features
 
 - **3 panes**: Claude Code (left), Terminal (top-right), LazyGit (bottom-right)
