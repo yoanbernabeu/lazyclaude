@@ -4,7 +4,7 @@ session="lazyclaude-$(basename "$PWD")"
 start_session() {
   tmux new-session -s "$session" -d "claude" \; \
     select-pane -T "CLAUDE" \; \
-    split-window -h -p 40 \; \
+    split-window -h -p 40 "echo ''; echo '  🚀 Welcome to LazyClaude!'; echo ''; echo '  📂 Type \"yazi\" to browse your files'; echo '  🔀 LazyGit is right below'; echo '  🤖 Claude Code is on the left pane'; echo ''; exec $SHELL" \; \
     select-pane -T "TERMINAL" \; \
     split-window -v -p 50 "lazygit" \; \
     select-pane -T "LAZYGIT" \; \
