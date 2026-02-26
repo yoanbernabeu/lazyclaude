@@ -4,14 +4,6 @@ A tmux workspace combining **Claude Code** + **LazyGit** + **Terminal** in a sin
 
 > **Note:** This is a personal tool I built for my own workflow. I'm sharing it publicly in case it's useful to others. Designed for **macOS** (uses Homebrew for dependencies). It may work on Linux with minor adjustments, but that's untested.
 
-```
-┌──────────┬──────────┐
-│          │ TERMINAL │
-│  CLAUDE  ├──────────┤
-│          │ LAZYGIT  │
-└──────────┴──────────┘
-```
-
 ![LazyClaude screenshot](image.png)
 
 ## Features
