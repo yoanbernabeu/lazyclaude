@@ -1,0 +1,84 @@
+#!/bin/bash
+session="lazyclaude-$(basename "$PWD")"
+
+start_session() {
+  tmux new-session -s "$session" -d "claude" \; \
+    select-pane -T "CLAUDE" \; \
+    split-window -h -p 40 \; \
+    select-pane -T "TERMINAL" \; \
+    split-window -v -p 50 "lazygit" \; \
+    select-pane -T "LAZYGIT" \; \
+    select-pane -t 0 \; \
+    attach
+}
+
+# List existing lazyclaude sessions
+existing=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | grep "^lazyclaude-" || true)
+
+if [ -n "$existing" ]; then
+  echo "🟢 Active lazyclaude sessions:"
+  echo ""
+  i=1
+  while IFS= read -r s; do
+    echo "  $i) $s"
+    i=$((i + 1))
+  done <<< "$existing"
+  echo ""
+  echo "What do you want to do?"
+  echo "  a) Attach to an existing session"
+  echo "  n) New session ($session)"
+  echo "  k) Kill a session"
+  echo "  K) Kill ALL sessions"
+  echo "  q) Quit"
+  echo ""
+  read -rp "Choice: " choice
+
+  case "$choice" in
+    a)
+      if [ "$(echo "$existing" | wc -l)" -eq 1 ]; then
+        tmux attach -t "$existing"
+      else
+        read -rp "Session number: " num
+        target=$(echo "$existing" | sed -n "${num}p")
+        if [ -n "$target" ]; then
+          tmux attach -t "$target"
+        else
+          echo "Invalid session."
+        fi
+      fi
+      ;;
+    n)
+      if tmux has-session -t "$session" 2>/dev/null; then
+        echo "⚠️  Session $session already exists. Use 'a' to attach or 'k' to kill it."
+      else
+        start_session
+      fi
+      ;;
+    k)
+      read -rp "Session number to kill: " num
+      target=$(echo "$existing" | sed -n "${num}p")
+      if [ -n "$target" ]; then
+        tmux kill-session -t "$target"
+        echo "✅ Session $target killed."
+      else
+        echo "Invalid session."
+      fi
+      start_session
+      ;;
+    K)
+      echo "$existing" | while IFS= read -r s; do
+        tmux kill-session -t "$s"
+      done
+      echo "✅ All lazyclaude sessions killed."
+      start_session
+      ;;
+    q)
+      exit 0
+      ;;
+    *)
+      echo "Invalid choice."
+      ;;
+  esac
+else
+  start_session
+fi
