@@ -9,11 +9,12 @@ A tmux workspace combining **Claude Code** + **LazyGit** + **Terminal** in a sin
 ## Features
 
 - **3 panes**: Claude Code (left), Terminal (top-right), LazyGit (bottom-right)
+- **iTerm2 native integration**: auto-detected CC mode uses native tabs, splits and scrollback
 - **File explorer**: type `yazi` in the terminal pane to browse files
 - **Mouse support**: click to switch panes, drag borders to resize
 - **Multi-session**: one session per project, interactive session manager
-- **Status bar**: project name, git branch, keyboard shortcuts
-- **Visual indicator**: green `▶` on active pane, heavy borders
+- **Status bar**: project name, git branch, keyboard shortcuts (classic mode)
+- **Visual indicator**: green `▶` on active pane, heavy borders (classic mode)
 
 ## Prerequisites
 
@@ -58,7 +59,40 @@ What do you want to do?
   q) Quit
 ```
 
+### iTerm2 integration (CC mode)
+
+When running inside **iTerm2**, LazyClaude automatically uses `tmux -CC` (control mode). This means tmux panes become **native iTerm2 splits** with all the benefits:
+
+- Native scrollback with mouse/trackpad
+- `Cmd+D` / `Cmd+Shift+D` to add splits
+- `Cmd+Opt+Arrow` to navigate between panes
+- Drag pane borders to resize
+- Full clipboard integration (Cmd+C / Cmd+V)
+- Native window management (Cmd+W to close, etc.)
+
+You can override the auto-detection:
+
+```bash
+lazyclaude --no-cc   # Force classic tmux mode (even in iTerm2)
+lazyclaude --cc      # Force CC mode (even outside iTerm2)
+```
+
+> **Tip:** In iTerm2, go to **Preferences → General → tmux** and check **"Automatically bury the tmux client session"** for the cleanest experience.
+
 ### Navigation
+
+#### iTerm2 CC mode (default on macOS)
+
+| Action | Shortcut |
+|--------|----------|
+| Switch pane | `Cmd+Opt+Arrow` or mouse click |
+| New split | `Cmd+D` (vertical) / `Cmd+Shift+D` (horizontal) |
+| Close pane | `Cmd+W` |
+| Resize pane | Drag the border |
+| File explorer | Type `yazi` in the terminal pane |
+| Detach session | Close the iTerm2 window |
+
+#### Classic tmux mode
 
 | Action | Shortcut |
 |--------|----------|

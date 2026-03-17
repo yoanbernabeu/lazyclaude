@@ -1,15 +1,43 @@
 #!/bin/bash
 session="lazyclaude-$(basename "$PWD")"
 
+# --- iTerm2 tmux CC mode detection ---
+USE_CC=false
+if [ "$TERM_PROGRAM" = "iTerm.app" ]; then
+  USE_CC=true
+fi
+
+for arg in "$@"; do
+  case "$arg" in
+    --cc) USE_CC=true ;;
+    --no-cc) USE_CC=false ;;
+  esac
+done
+
+tmux_attach() {
+  if $USE_CC; then
+    tmux -CC attach -t "$1"
+  else
+    tmux attach -t "$1"
+  fi
+}
+
 start_session() {
-  tmux new-session -s "$session" -d "claude" \; \
-    select-pane -T "CLAUDE" \; \
-    split-window -h -p 40 "echo ''; echo '  🚀 Welcome to LazyClaude!'; echo ''; echo '  📂 Type \"yazi\" to browse your files'; echo '  🔀 LazyGit is right below'; echo '  🤖 Claude Code is on the left pane'; echo ''; exec $SHELL" \; \
-    select-pane -T "TERMINAL" \; \
-    split-window -v -p 50 "lazygit" \; \
-    select-pane -T "LAZYGIT" \; \
-    select-pane -t 0 \; \
-    attach
+  # Create session detached, then set up panes
+  tmux new-session -s "$session" -d "claude"
+  tmux select-pane -T "CLAUDE" -t "$session"
+  tmux split-window -h -t "$session" -p 40 \
+    "echo ''; echo '  🚀 Welcome to LazyClaude!'; echo ''; echo '  📂 Type \"yazi\" to browse your files'; echo '  🔀 LazyGit is right below'; echo '  🤖 Claude Code is on the left pane'; echo ''; exec $SHELL"
+  tmux select-pane -T "TERMINAL" -t "$session"
+  tmux split-window -v -t "$session" -p 50 "lazygit"
+  tmux select-pane -T "LAZYGIT" -t "$session"
+  tmux select-pane -t "${session}:0.0"
+
+  # Attach with or without CC mode
+  if $USE_CC; then
+    echo "🍎 iTerm2 detected — using native tmux integration (CC mode)"
+  fi
+  tmux_attach "$session"
 }
 
 # List existing lazyclaude sessions
@@ -36,12 +64,12 @@ if [ -n "$existing" ]; then
   case "$choice" in
     a)
       if [ "$(echo "$existing" | wc -l)" -eq 1 ]; then
-        tmux attach -t "$existing"
+        tmux_attach "$existing"
       else
         read -rp "Session number: " num
         target=$(echo "$existing" | sed -n "${num}p")
         if [ -n "$target" ]; then
-          tmux attach -t "$target"
+          tmux_attach "$target"
         else
           echo "Invalid session."
         fi
